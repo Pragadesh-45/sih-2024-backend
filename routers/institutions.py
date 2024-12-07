@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from database import institutions_collection
+from database import institutions_collection,trainers_collection,sessions_collection
 from models import Institution
 
 router = APIRouter()
@@ -33,3 +33,42 @@ async def delete_institution(institution_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Institution not found")
     return {"message": "Institution deleted successfully"}
+
+@router.get("/institutions/{institution_id}/trainers")
+async def get_trainers_for_institution(institution_id: str):
+    # Fetch the institution to check if it exists
+    institution = institutions_collection.find_one({"id": institution_id})
+    print(institution)
+    if not institution:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    
+    # Assuming each institution stores trainer IDs (or references)
+    trainer_ids = institution.get("trainers", [])
+
+    
+    if not trainer_ids:
+        raise HTTPException(status_code=404, detail="No trainers found for this institution")
+    
+    # Fetch trainers associated with the institution
+    trainers = list(trainers_collection.find({"id": {"$in": trainer_ids}}, {"_id": 0}))
+    
+    if not trainers:
+        raise HTTPException(status_code=404, detail="No trainers found")
+    
+    return trainers
+
+
+@router.get("/institutions/{institution_id}/sessions")
+async def get_sessions_for_institution(institution_id: str):
+    # Fetch the institution to check if it exists
+    institution = institutions_collection.find_one({"id": institution_id})
+    if not institution:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    
+    # Fetch sessions associated with the institution
+    sessions = list(sessions_collection.find({"institution_id": institution_id}, {"_id": 0}))
+    
+    if not sessions:
+        raise HTTPException(status_code=404, detail="No sessions found for this institution")
+    
+    return sessions

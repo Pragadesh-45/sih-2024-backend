@@ -9,9 +9,11 @@ from emailservice import send_email
 @router.post("/trainers/")
 async def create_trainer(trainer: Trainer):
     existing_trainer = trainers_collection.find_one({"email": trainer.email})
+    existing_trainer_id = trainers_collection.find_one({"id": trainer.id})
     if existing_trainer:
         raise HTTPException(status_code=400, detail="Trainer with this email already exists")
-    
+    if existing_trainer_id:
+        raise HTTPException(status_code=400, detail="Trainer with this Trainer Id already exists")
     trainers_collection.insert_one(trainer.dict())
     
     subject = "Welcome to Our Platform"

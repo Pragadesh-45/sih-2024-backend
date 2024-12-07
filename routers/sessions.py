@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from database import sessions_collection, trainers_collection
+from database import sessions_collection, trainers_collection,slots_collection
 from models import Session
 from emailservice import send_email
 
@@ -71,3 +71,19 @@ async def delete_session(session_id: str):
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Session not found")
     return {"message": "Session deleted successfully"}
+
+@router.get("/sessions/{session_id}/slots")
+async def get_slots_for_session(session_id: str):
+    # First, check if the session exists
+    session = sessions_collection.find_one({"id": session_id}, {"_id": 0})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # Now, fetch slots from the slots collection that belong to this session
+    slots = slots_collection.find({"session_id": session_id}, {"_id": 0})
+    
+    # If no slots are found, raise an error
+    slots_list = list(slots)
+    if not slots_list:
+        raise HTTPException(status_code=404, detail="No slots found for this session")
+    return slots_list
