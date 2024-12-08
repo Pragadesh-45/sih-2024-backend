@@ -24,14 +24,14 @@ async def get_user(email: str):
 
 @router.put("/users/{user_id}")
 async def update_user(user_id: str, user: User):
-    result = users_collection.update_one({"id": user_id}, {"$set": user.dict()})
+    result = users_collection.update_one({"uid": user_id}, {"$set": user.dict()})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User updated successfully"}
 
 @router.delete("/users/{user_id}")
 async def delete_user(user_id: str):
-    result = users_collection.delete_one({"id": user_id})
+    result = users_collection.delete_one({"uid": user_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
     return {"message": "User deleted successfully"}
