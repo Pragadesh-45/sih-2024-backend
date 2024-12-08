@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import users, institutions, sessions, slots,trainers
+from routers import users, institutions, sessions, slots, trainers, insights
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -22,3 +22,4 @@ app.include_router(institutions.router, prefix="/api/v1", tags=["Institutions"])
 app.include_router(sessions.router, prefix="/api/v1", tags=["Sessions"])
 app.include_router(slots.router, prefix="/api/v1", tags=["Slots"])
 app.include_router(trainers.router, prefix="/api/v1", tags=["Trainers"])
+app.include_router(insights.router, prefix="/api/v1", tags=["Insights"])
