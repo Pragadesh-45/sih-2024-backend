@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from database import users_collection
+from database import users_collection,institutions_collection
 from models import User
 
 router = APIRouter()
@@ -15,11 +15,26 @@ async def login(email: str, password: str):
     
     if password != user['password']:
         raise HTTPException(status_code=400, detail="Wrong Password")
-    return {
+    
+    response = {
         "message": "Login successful",
         "email": user['email'],
-        "role": user['role']  # assuming the role is stored in the user document
+        "role": user['role']
     }
+    
+    if user['role'] == "institution":
+        # Fetch the corresponding institution
+        institution = institutions_collection.find_one({"email": user['email']})
+        if institution:
+            response["institution_uid"] = institution["uid"]
+    elif user['role'] == "regulatory":
+        # Fetch the corresponding regulatory entity
+        regulatory = regulatory_collection.find_one({"email": user['email']})
+        if regulatory:
+            response["regulatory_uid"] = regulatory["uid"]
+    
+    return response
+
 @router.post("/users/")
 async def create_user(user: User):
     if users_collection.find_one({"email": user.email}):

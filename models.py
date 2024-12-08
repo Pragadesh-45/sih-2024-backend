@@ -61,3 +61,12 @@ class Session(BaseModel):
     average_eng_score: float = None
     slots: List[Slot]  
 
+class Regulatory(BaseModel):
+    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))   
+    id: str = None
+    name: str
+    location: str
+    average_score: float = 0.0
+    user_id: str=None  
+    email: str
+    password:str =None
