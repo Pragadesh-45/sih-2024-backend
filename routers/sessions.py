@@ -8,44 +8,28 @@ router = APIRouter()
 
 @router.post("/sessions/")
 async def create_session(session: Session):
-    sessions_collection.insert_one(session.dict())
-    
-    trainer_emails = []
-    for trainer_id in session.trainer_ids:
-        trainer = trainers_collection.find_one({"uid": trainer_id})
-        if not trainer:
-            raise HTTPException(status_code=404, detail=f"Trainer with ID {trainer_id} not found")
-        
-        trainer_email = trainer.get("email")
-        if not trainer_email:
-            raise HTTPException(status_code=404, detail=f"Email for Trainer ID {trainer_id} not found")
-        
-        trainer_emails.append((trainer_email, trainer.get("name")))
-    
-    subject = "New Session Assigned"
-    
-    for trainer_email, trainer_name in trainer_emails:
-        message = f"""
-        Hello {trainer_name},
-        
-        A new session has been assigned to you:
-        - Session ID: {session.id}
-        - Session Name: {session.name}
-        - Number of Slots: {session.no_of_slots}
-        - Institution ID: {session.institution_id}
+    institution = institutions_collection.find_one({"uid": session.institution_id})
+    if not institution:
+        raise HTTPException(status_code=404, detail="Institution not found")
+   
+    for slot in session.slots:
+        slot.session_id = session.uid  
 
-        Please log in to your account to view more details.
+    slots_data = [slot.dict() for slot in session.slots]  
+    slots_collection.insert_many(slots_data)  
 
-        Regards,
-        Your Team Poriyaalargal
-        """
-        
-        try:
-            send_email(trainer_email, subject, message)
-        except Exception as e:
-            raise HTTPException(status_code=500, detail=f"Error sending email to {trainer_email}: {str(e)}")
-    
-    return {"message": "Session created and emails sent to all trainers successfully"}
+    session_data = session.dict()  
+    sessions_collection.insert_one(session_data) 
+    institutions_collection.update_one(
+        {"uid": session.institution_id},
+        {"$push": {"sessions": session.uid}} 
+    )
+
+
+    return {
+        "message": "Session created successfully with slots linked and stored.",
+        "session_id": session.uid
+    }
 
 @router.get("/sessions/")
 async def get_sessions():

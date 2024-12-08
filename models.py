@@ -37,17 +37,6 @@ class Trainer(BaseModel):
     sessions: List[str] = []  
     slots: List[str] = [] 
 
-# Session model
-class Session(BaseModel):
-    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))
-    id: str = None
-    trainer_ids: List[str]  
-    institution_id: str
-    name: str
-    no_of_slots: int  
-    average_eng_score: float = None
-    slots: List[str]  
-
 # Slot model
 class Slot(BaseModel):
     uid: str = Field(default_factory=lambda: str(uuid.uuid4()))  
@@ -58,5 +47,17 @@ class Slot(BaseModel):
     time_to: str
     engagement_score: float =None
     report: Optional[str] =""
-    session_id: str 
+    session_id: str = None
     trainer_id: str  
+
+# Session model
+class Session(BaseModel):
+    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = None
+    trainer_ids: List[str]  
+    institution_id: str
+    name: str
+    no_of_slots: int  
+    average_eng_score: float = None
+    slots: List[Slot]  
+

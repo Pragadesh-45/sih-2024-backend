@@ -113,20 +113,20 @@ async def delete_institution(institution_id: str):
 #     return trainers
 
 
-@router.get("/institutions/{institution_id}/sessions")
-async def get_sessions_for_institution(institution_id: str):
-    # Fetch the institution to check if it exists
-    institution = institutions_collection.find_one({"uid": institution_id})
-    if not institution:
-        raise HTTPException(status_code=404, detail="Institution not found")
+# @router.get("/institutions/{institution_id}/sessions")
+# async def get_sessions_for_institution(institution_id: str):
+#     # Fetch the institution to check if it exists
+#     institution = institutions_collection.find_one({"uid": institution_id})
+#     if not institution:
+#         raise HTTPException(status_code=404, detail="Institution not found")
     
-    # Fetch sessions associated with the institution
-    sessions = list(sessions_collection.find({"institution_id": institution_id}, {"_id": 0}))
+#     # Fetch sessions associated with the institution
+#     sessions = list(sessions_collection.find({"institution_id": institution_id}, {"_id": 0}))
     
-    if not sessions:
-        raise HTTPException(status_code=404, detail="No sessions found for this institution")
+#     if not sessions:
+#         raise HTTPException(status_code=404, detail="No sessions found for this institution")
     
-    return sessions
+#     return sessions
 
 
 
