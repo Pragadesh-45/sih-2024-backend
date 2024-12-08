@@ -2,7 +2,7 @@ from pydantic import BaseModel,Field,validator
 from typing import List, Optional
 import uuid
 
-# User model 
+# User model
 class User(BaseModel):
     uid: str = Field(default_factory=lambda: str(uuid.uuid4()))   
     id: str = None
