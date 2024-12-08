@@ -7,6 +7,7 @@ from emailservice import send_email
 router = APIRouter()
 
 @router.post("/sessions/")
+@router.post("/sessions/")
 async def create_session(session: Session):
     sessions_collection.insert_one(session.dict())
     
