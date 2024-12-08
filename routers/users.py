@@ -15,9 +15,9 @@ async def create_user(user: User):
 async def get_users():
     return list(users_collection.find({}, {"_id": 0}))
 
-@router.get("/users/{user_id}")
-async def get_user(user_id: str):
-    user = users_collection.find_one({"id": user_id}, {"_id": 0})
+@router.get("/users/{email}")
+async def get_user(email: str):
+    user = users_collection.find_one({"email": email}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user
