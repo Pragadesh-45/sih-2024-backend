@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from database import trainers_collection,institutions_collection  
+from database import trainers_collection,institutions_collection, sessions_collection
 from models import Trainer  
 import secrets
 from emailservice import send_email
@@ -130,3 +130,25 @@ async def get_trainers_for_institution(institution_id: str):
         raise HTTPException(status_code=404, detail="No trainers found")
     
     return trainers
+
+@router.get("/trainers/{trainer_id}/engagement")
+async def get_trainer_engagement(trainer_id: str):
+    sessions = list(sessions_collection.find({"trainer_ids": trainer_id}))
+    if not sessions:
+        raise HTTPException(status_code=404, detail="No sessions found for this trainer")
+
+    total_score = sum(session["average_eng_score"] for session in sessions)
+    average_score = total_score / len(sessions)
+
+    return {"trainer_id": trainer_id, "average_engagement_score": average_score}
+
+@router.get("/engagement/overall")
+async def get_overall_engagement():
+    sessions = list(sessions_collection.find({}))
+    if not sessions:
+        raise HTTPException(status_code=404, detail="No sessions found")
+
+    total_score = sum(session["average_eng_score"] for session in sessions)
+    average_score = total_score / len(sessions)
+
+    return {"average_engagement_score": average_score}

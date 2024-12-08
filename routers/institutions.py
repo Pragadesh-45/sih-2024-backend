@@ -150,3 +150,14 @@ async def delete_institution(institution_id: str):
 #         raise HTTPException(status_code=404, detail="Session update failed")
     
 #     return {"message": "Session updated successfully"}
+
+@router.get("/institutions/{institution_id}/engagement")
+async def get_institution_engagement(institution_id: str):
+    sessions = list(sessions_collection.find({"institution_id": institution_id}))
+    if not sessions:
+        raise HTTPException(status_code=404, detail="No sessions found for this institution")
+
+    total_score = sum(session["average_eng_score"] for session in sessions)
+    average_score = total_score / len(sessions)
+
+    return {"institution_id": institution_id, "average_engagement_score": average_score}
