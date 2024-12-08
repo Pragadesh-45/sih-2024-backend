@@ -1,17 +1,51 @@
 from fastapi import APIRouter, HTTPException
 from database import institutions_collection,trainers_collection,sessions_collection
-from models import Institution
+from models import Institution,Session
+import secrets
+from emailservice import send_email
 
 router = APIRouter()
 
+def generate_random_password(length=8):
+    return secrets.token_urlsafe(length)[:length]
+
+# POST: Create Institution with Plain-Text Password
 @router.post("/institutions/")
 async def create_institution(institution: Institution):
+    random_password = generate_random_password()
+    
+    institution.password = random_password  
+    
     institutions_collection.insert_one(institution.dict())
-    return {"message": "Institution created successfully"}
+    
+    subject = "Welcome to the ClassOfOne"
+    message = f"""
+    Hello {institution.name},
+    
+    Welcome to our platform! Your institution account has been successfully created.
+    Below are your login details:
+    
+    - Email: {institution.email}
+    - Password: {random_password}
+    
+    Please change your password upon logging in for the first time.
+
+    Best regards,
+    The Team Poriyaalargal
+    """
+    
+    try:
+        send_email(institution.email, subject, message)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error sending welcome email: {str(e)}")
+    
+    return {"message": "Institution created successfully and welcome email sent"}
+
 
 @router.get("/institutions/")
 async def get_institutions():
     return list(institutions_collection.find({}, {"_id": 0}))
+
 
 @router.get("/institutions/{institution_id}")
 async def get_institution(institution_id: str):
@@ -72,3 +106,25 @@ async def get_sessions_for_institution(institution_id: str):
         raise HTTPException(status_code=404, detail="No sessions found for this institution")
     
     return sessions
+
+
+
+
+# Edit session
+@router.patch("/institutions/{institution_id}/sessions/{session_id}")
+async def update_session_for_institution(institution_id: str, session_id: str, session: Session):
+    institution = institutions_collection.find_one({"id": institution_id})
+    if not institution:
+        raise HTTPException(status_code=404, detail="Institution not found")
+    
+    existing_session = sessions_collection.find_one({"id": session_id, "institution_id": institution_id})
+    if not existing_session:
+        raise HTTPException(status_code=404, detail="Session not found for this institution")
+    
+    session_data = session.dict(exclude_unset=True)  
+    result = sessions_collection.update_one({"id": session_id, "institution_id": institution_id}, {"$set": session_data})
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Session update failed")
+    
+    return {"message": "Session updated successfully"}
