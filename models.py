@@ -1,14 +1,14 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
-# User model 
+# User model
 class User(BaseModel):
     id: str
     name: str
     email: str
     password: str
-    role: str  
-
+    role: str  # trainer, institution, regulatory body
+    
 # Institution model
 class Institution(BaseModel):
     id: str
@@ -33,10 +33,10 @@ class Trainer(BaseModel):
 # Session model
 class Session(BaseModel):
     id: str
-    trainer_ids: List[str]  
+    trainer_ids: List[str]
     institution_id: str
     name: str
-    no_of_slots: int  
+    no_of_slots: int
     average_eng_score: float
     slots: List[str]  
 
@@ -49,5 +49,5 @@ class Slot(BaseModel):
     time_to: str
     engagement_score: float
     report: Optional[str]
-    session_id: str 
-    trainer_id: str  
+    session_id: str
+    trainer_id: str
