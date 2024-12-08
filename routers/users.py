@@ -19,19 +19,22 @@ async def login(email: str, password: str):
     response = {
         "message": "Login successful",
         "email": user['email'],
-        "role": user['role']
+        "role": user['role'],
+        "uid":""
     }
     
     if user['role'] == "institution":
         # Fetch the corresponding institution
+        
         institution = institutions_collection.find_one({"email": user['email']})
+        print(institution)
         if institution:
-            response["institution_uid"] = institution["uid"]
-    elif user['role'] == "regulatory":
-        # Fetch the corresponding regulatory entity
-        regulatory = regulatory_collection.find_one({"email": user['email']})
-        if regulatory:
-            response["regulatory_uid"] = regulatory["uid"]
+            response["uid"] = institution["uid"]
+    # elif user['role'] == "regulatory":
+    #     # Fetch the corresponding regulatory entity
+    #     # regulatory = regulatory_collection.find_one({"email": user['email']})
+    #     if regulatory:
+    #         response["regulatory_uid"] = regulatory["uid"]
     
     return response
 

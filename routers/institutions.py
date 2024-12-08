@@ -66,6 +66,7 @@ async def get_institutions():
     return list(institutions_collection.find({}, {"_id": 0}))
 
 
+
 @router.get("/institutions/{institution_id}")
 async def get_institution(institution_id: str):
     institution = institutions_collection.find_one({"uid": institution_id}, {"_id": 0})

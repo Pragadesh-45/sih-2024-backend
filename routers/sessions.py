@@ -4,6 +4,7 @@ from models import Session,Slot
 from emailservice import send_email
 
 
+
 router = APIRouter()
 
 @router.post("/sessions/")

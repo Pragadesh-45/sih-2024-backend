@@ -8,6 +8,13 @@ from emailservice import send_email
 def generate_random_password(length=8):
     return secrets.token_urlsafe(length)[:length]
 
+import secrets
+from emailservice import send_email
+
+
+def generate_random_password(length=8):
+    return secrets.token_urlsafe(length)[:length]
+
 
 router = APIRouter()
 
@@ -35,6 +42,15 @@ async def create_trainer(trainer: Trainer):
     message = f"""
     Hello {trainer.name},
     
+    Welcome to our platform! Your trainer account has been successfully created.
+    Below are your login details:
+    
+    - Email: {trainer.email}
+    - Password: {random_password}
+    
+    Institution: {institution.get('name', 'Unknown')}
+    
+    Please change your password upon logging in for the first time.
     Welcome to our platform! Your trainer account has been successfully created.
     Below are your login details:
     

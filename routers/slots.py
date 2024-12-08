@@ -124,3 +124,4 @@ async def delete_slot(slot_id: str):
         raise HTTPException(status_code=404, detail="Slot not found")
     return {"message": "Slot deleted successfully"}
 
+
