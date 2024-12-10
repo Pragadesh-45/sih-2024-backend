@@ -50,7 +50,7 @@ async def update_institution_average_engagement(institution_id: str):
     average_score = total_score / len(sessions)
 
     # Determine the institution's status based on the average score
-    if 0<average_score < 50:
+    if 0 <= average_score < 50:
         status = "poor"
     elif 50 <= average_score < 75:
         status = "average"

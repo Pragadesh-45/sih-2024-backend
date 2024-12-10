@@ -31,13 +31,13 @@ class Institution(BaseModel):
     password:str =None
     trainers: List[str] =[]
     sessions: List[str]=[]
-    status:str = None 
+    status:str = "poor" 
 
 
     password:str =None
     trainers: List[str] =[]
     sessions: List[str]=[]
-    status:str = None 
+    status:str = "poor" 
 
 
 
