@@ -1,6 +1,8 @@
 from pydantic import BaseModel,Field,validator
 from pydantic import BaseModel,Field,validator
+from pydantic import BaseModel,Field,validator
 from typing import List, Optional
+import uuid
 import uuid
 import uuid
 
@@ -10,9 +12,12 @@ class User(BaseModel):
     id: str = None
     uid: str = Field(default_factory=lambda: str(uuid.uuid4()))   
     id: str = None
+    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))   
+    id: str = None
     name: str
     email: str
     password: str
+    role: str =None
     role: str =None
     role: str =None
 # Institution model
@@ -21,8 +26,12 @@ class Institution(BaseModel):
     id: str = None
     uid: str = Field(default_factory=lambda: str(uuid.uuid4()))   
     id: str = None
+    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))   
+    id: str = None
     name: str
     location: str
+    average_score: float = 0.0
+    user_id: str=None  
     average_score: float = 0.0
     user_id: str=None  
     average_score: float = 0.0
@@ -43,8 +52,11 @@ class Trainer(BaseModel):
     id: str = None
     uid: str = Field(default_factory=lambda: str(uuid.uuid4()))
     id: str = None
+    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    id: str = None
     name: str
     email: str
+    password: str = None
     password: str = None
     password: str = None
     institution_id: str  

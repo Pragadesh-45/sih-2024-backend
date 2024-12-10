@@ -20,6 +20,19 @@ async def create_slot(slot: Slot):
     
     return {"message": "Slot created successfully and session updated"}
 
+    
+    session = sessions_collection.find_one({"uid": slot.session_id})
+    
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    sessions_collection.update_one(
+        {"uid": slot.session_id},
+        {"$push": {"slots": slot.uid}}
+    )
+    
+    return {"message": "Slot created successfully and session updated"}
+
 
 @router.get("/slots/")
 async def get_slots():
@@ -27,6 +40,7 @@ async def get_slots():
 
 @router.get("/slots/{slot_id}")
 async def get_slot(slot_id: str):
+    slot = slots_collection.find_one({"uid": slot_id}, {"_id": 0})
     slot = slots_collection.find_one({"uid": slot_id}, {"_id": 0})
     if not slot:
         raise HTTPException(status_code=404, detail="Slot not found")
@@ -47,10 +61,11 @@ async def update_institution_average_engagement(institution_id: str):
 
     # Calculate the average score for the institution
     total_score = sum(session["average_eng_score"] or 0 for session in sessions)
+    total_score = sum(session["average_eng_score"] or 0 for session in sessions)
     average_score = total_score / len(sessions)
 
     # Determine the institution's status based on the average score
-    if 0<average_score < 50:
+    if 0 <= average_score < 50:
         status = "poor"
     elif 50 <= average_score < 75:
         status = "average"
@@ -72,10 +87,13 @@ async def update_session_average_engagement(session_id: str):
         raise HTTPException(status_code=404, detail="No slots found for this session")
 
     total_score = sum(slot["engagement_score"] or 0 for slot in slots)
+    total_score = sum(slot["engagement_score"] or 0 for slot in slots)
     average_score = total_score / len(slots)
 
     sessions_collection.update_one({"uid": session_id}, {"$set": {"average_eng_score": average_score}})
+    sessions_collection.update_one({"uid": session_id}, {"$set": {"average_eng_score": average_score}})
 
+    session = sessions_collection.find_one({"uid": session_id})
     session = sessions_collection.find_one({"uid": session_id})
     institution_id = session["institution_id"]
 
@@ -86,9 +104,11 @@ async def update_session_average_engagement(session_id: str):
 @router.put("/slots/{slot_id}")
 async def update_slot(slot_id: str, slot: Slot):
     result = slots_collection.update_one({"uid": slot_id}, {"$set": slot.dict()})
+    result = slots_collection.update_one({"uid": slot_id}, {"$set": slot.dict()})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Slot not found")
     
+    updated_slot = slots_collection.find_one({"uid": slot_id})
     updated_slot = slots_collection.find_one({"uid": slot_id})
     session_id = updated_slot["session_id"]
     print("Successfully updated")
@@ -128,8 +148,10 @@ async def update_slot(slot_id: str, slot: SlotUpdate):
 @router.delete("/slots/{slot_id}")
 async def delete_slot(slot_id: str):
     result = slots_collection.delete_one({"uid": slot_id})
+    result = slots_collection.delete_one({"uid": slot_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Slot not found")
     return {"message": "Slot deleted successfully"}
+
 
 
