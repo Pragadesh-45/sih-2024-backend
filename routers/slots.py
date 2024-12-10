@@ -59,7 +59,7 @@ async def update_institution_average_engagement(institution_id: str):
 
     # Update the institution's average score and status
     institutions_collection.update_one(
-        {"id": institution_id},
+        {"uid": institution_id},
         {"$set": {"average_score": average_score, "status": status}}
     )
 
