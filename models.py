@@ -90,3 +90,17 @@ class Regulatory(BaseModel):
     user_id: str=None  
     email: str
     password:str =None
+
+
+class SlotUpdate(BaseModel):
+    title: Optional[str] = None
+    date: Optional[str] = None
+    time_from: Optional[str] = None
+    time_to: Optional[str] = None
+    engagement_score: Optional[float] = None
+    report: Optional[str] = None
+    session_id: Optional[str] = None
+    trainer_id: Optional[str] = None
+
+    class Config:
+        orm_mode = True
