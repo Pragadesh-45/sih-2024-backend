@@ -137,7 +137,7 @@ async def get_trainer_engagement(trainer_id: str):
     if not sessions:
         raise HTTPException(status_code=404, detail="No sessions found for this trainer")
 
-    total_score = sum(session["average_eng_score"] for session in sessions)
+    total_score = sum(session["average_eng_score"] or 0 for session in sessions)
     average_score = total_score / len(sessions)
 
     return {"trainer_id": trainer_id, "average_engagement_score": average_score}
@@ -148,7 +148,7 @@ async def get_overall_engagement():
     if not sessions:
         raise HTTPException(status_code=404, detail="No sessions found")
 
-    total_score = sum(session["average_eng_score"] for session in sessions)
+    total_score = sum(session["average_eng_score"] or 0 for session in sessions)
     average_score = total_score / len(sessions)
 
     return {"average_engagement_score": average_score}

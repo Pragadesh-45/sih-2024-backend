@@ -157,7 +157,7 @@ async def get_institution_engagement(institution_id: str):
     if not sessions:
         raise HTTPException(status_code=404, detail="No sessions found for this institution")
 
-    total_score = sum(session["average_eng_score"] for session in sessions)
+    total_score = sum(session["average_eng_score"] or 0 for session in sessions)
     average_score = total_score / len(sessions)
 
     return {"institution_id": institution_id, "average_engagement_score": average_score}
