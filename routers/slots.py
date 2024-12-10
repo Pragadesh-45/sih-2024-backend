@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from database import slots_collection,sessions_collection,institutions_collection
-from models import Slot
+from models import Slot,SlotUpdate
 
 router = APIRouter()
 
@@ -58,11 +58,12 @@ async def update_institution_average_engagement(institution_id: str):
         status = "excellent"
 
     # Update the institution's average score and status
+
     institutions_collection.update_one(
-        {"id": institution_id},
+        {"uid": institution_id},
         {"$set": {"average_score": average_score, "status": status}}
     )
-
+    print("Institution update successfull")
 
 
 async def update_session_average_engagement(session_id: str):
@@ -101,16 +102,23 @@ async def update_slot(slot_id: str, slot: Slot):
 
 #used by AI model to update engagement_scores
 @router.patch("/slots/{slot_id}")
-async def update_slot(slot_id: str, slot: Slot):
+async def update_slot(slot_id: str, slot: SlotUpdate):
+    # Extract only fields that are set
     update_fields = slot.dict(exclude_unset=True)
 
+    if not update_fields:
+        raise HTTPException(status_code=400, detail="No fields provided for update")
+
+    # Perform the database update
     result = slots_collection.update_one({"uid": slot_id}, {"$set": update_fields})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Slot not found")
     
+    # Fetch the updated slot
     updated_slot = slots_collection.find_one({"uid": slot_id})
     session_id = updated_slot["session_id"]
 
+    # Update related scores
     await update_session_average_engagement(session_id)
 
     return {"message": "Slot updated successfully and related scores recalculated"}

@@ -130,8 +130,6 @@ async def get_trainers_for_institution(institution_id: str):
         raise HTTPException(status_code=404, detail="No trainers found")
     
     return trainers
-<<<<<<< HEAD
-=======
 
 @router.get("/trainers/{trainer_id}/engagement")
 async def get_trainer_engagement(trainer_id: str):
@@ -154,4 +152,3 @@ async def get_overall_engagement():
     average_score = total_score / len(sessions)
 
     return {"average_engagement_score": average_score}
->>>>>>> 70ac2cb35d4306322de4461076d1bd4b48057220

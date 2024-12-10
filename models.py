@@ -34,10 +34,6 @@ class Institution(BaseModel):
     status:str = None 
 
 
-    password:str =None
-    trainers: List[str] =[]
-    sessions: List[str]=[]
-    status:str = None 
 
 
 
@@ -57,8 +53,6 @@ class Trainer(BaseModel):
 
 # Slot model
 class Slot(BaseModel):
-    uid: str = Field(default_factory=lambda: str(uuid.uuid4()))  
-    id: str = None
     uid: str = Field(default_factory=lambda: str(uuid.uuid4()))  
     id: str = None
     title: str
@@ -90,3 +84,17 @@ class Regulatory(BaseModel):
     user_id: str=None  
     email: str
     password:str =None
+
+
+class SlotUpdate(BaseModel):
+    title: Optional[str] = None
+    date: Optional[str] = None
+    time_from: Optional[str] = None
+    time_to: Optional[str] = None
+    engagement_score: Optional[float] = None
+    report: Optional[str] = None
+    session_id: Optional[str] = None
+    trainer_id: Optional[str] = None
+
+    class Config:
+        orm_mode = True
