@@ -46,7 +46,7 @@ async def update_institution_average_engagement(institution_id: str):
         raise HTTPException(status_code=404, detail="No sessions found for this institution")
 
     # Calculate the average score for the institution
-    total_score = sum(session["average_eng_score"] for session in sessions)
+    total_score = sum(session["average_eng_score"] or 0 for session in sessions)
     average_score = total_score / len(sessions)
 
     # Determine the institution's status based on the average score
@@ -70,7 +70,7 @@ async def update_session_average_engagement(session_id: str):
     if not slots:
         raise HTTPException(status_code=404, detail="No slots found for this session")
 
-    total_score = sum(slot["engagement_score"] for slot in slots)
+    total_score = sum(slot["engagement_score"] or 0 for slot in slots)
     average_score = total_score / len(slots)
 
     sessions_collection.update_one({"uid": session_id}, {"$set": {"average_eng_score": average_score}})

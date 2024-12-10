@@ -106,3 +106,18 @@ async def get_sessions_for_institution(institution_id: str):
         raise HTTPException(status_code=404, detail="No sessions found for this institution")
     
     return sessions
+<<<<<<< HEAD
+=======
+
+@router.get("/sessions/{session_id}/engagement")
+async def get_session_engagement(session_id: str):
+    slots = list(slots_collection.find({"session_id": session_id}))
+    if not slots:
+        raise HTTPException(status_code=404, detail="No slots found for this session")
+    
+
+    total_score = sum(slot["engagement_score"] or 0 for slot in slots)
+    average_score = total_score / len(slots)
+
+    return {"session_id": session_id, "average_engagement_score": average_score}
+>>>>>>> 70ac2cb35d4306322de4461076d1bd4b48057220
