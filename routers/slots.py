@@ -20,19 +20,6 @@ async def create_slot(slot: Slot):
     
     return {"message": "Slot created successfully and session updated"}
 
-    
-    session = sessions_collection.find_one({"uid": slot.session_id})
-    
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    
-    sessions_collection.update_one(
-        {"uid": slot.session_id},
-        {"$push": {"slots": slot.uid}}
-    )
-    
-    return {"message": "Slot created successfully and session updated"}
-
 
 @router.get("/slots/")
 async def get_slots():
@@ -40,7 +27,6 @@ async def get_slots():
 
 @router.get("/slots/{slot_id}")
 async def get_slot(slot_id: str):
-    slot = slots_collection.find_one({"uid": slot_id}, {"_id": 0})
     slot = slots_collection.find_one({"uid": slot_id}, {"_id": 0})
     if not slot:
         raise HTTPException(status_code=404, detail="Slot not found")
@@ -61,7 +47,6 @@ async def update_institution_average_engagement(institution_id: str):
 
     # Calculate the average score for the institution
     total_score = sum(session["average_eng_score"] or 0 for session in sessions)
-    total_score = sum(session["average_eng_score"] or 0 for session in sessions)
     average_score = total_score / len(sessions)
 
     # Determine the institution's status based on the average score
@@ -73,27 +58,23 @@ async def update_institution_average_engagement(institution_id: str):
         status = "excellent"
 
     # Update the institution's average score and status
-
     institutions_collection.update_one(
         {"uid": institution_id},
         {"$set": {"average_score": average_score, "status": status}}
     )
-    print("Institution update successfull")
 
 
-async def update_session_average_engagement(session_id: str, SlotUpdate: SlotUpdate):
+
+async def update_session_average_engagement(session_id: str):
     slots = list(slots_collection.find({"session_id": session_id}))
     if not slots:
         raise HTTPException(status_code=404, detail="No slots found for this session")
 
     total_score = sum(slot["engagement_score"] or 0 for slot in slots)
-    total_score = sum(slot["engagement_score"] or 0 for slot in slots)
     average_score = total_score / len(slots)
 
     sessions_collection.update_one({"uid": session_id}, {"$set": {"average_eng_score": average_score}})
-    sessions_collection.update_one({"uid": session_id}, {"$set": {"average_eng_score": average_score}})
 
-    session = sessions_collection.find_one({"uid": session_id})
     session = sessions_collection.find_one({"uid": session_id})
     institution_id = session["institution_id"]
 
@@ -104,11 +85,9 @@ async def update_session_average_engagement(session_id: str, SlotUpdate: SlotUpd
 @router.put("/slots/{slot_id}")
 async def update_slot(slot_id: str, slot: Slot):
     result = slots_collection.update_one({"uid": slot_id}, {"$set": slot.dict()})
-    result = slots_collection.update_one({"uid": slot_id}, {"$set": slot.dict()})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Slot not found")
     
-    updated_slot = slots_collection.find_one({"uid": slot_id})
     updated_slot = slots_collection.find_one({"uid": slot_id})
     session_id = updated_slot["session_id"]
     print("Successfully updated")
@@ -123,22 +102,15 @@ async def update_slot(slot_id: str, slot: Slot):
 #used by AI model to update engagement_scores
 @router.patch("/slots/{slot_id}")
 async def update_slot(slot_id: str, slot: SlotUpdate):
-    # Extract only fields that are set
     update_fields = slot.dict(exclude_unset=True)
 
-    if not update_fields:
-        raise HTTPException(status_code=400, detail="No fields provided for update")
-
-    # Perform the database update
     result = slots_collection.update_one({"uid": slot_id}, {"$set": update_fields})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Slot not found")
     
-    # Fetch the updated slot
     updated_slot = slots_collection.find_one({"uid": slot_id})
     session_id = updated_slot["session_id"]
 
-    # Update related scores
     await update_session_average_engagement(session_id)
 
     return {"message": "Slot updated successfully and related scores recalculated"}
@@ -148,10 +120,8 @@ async def update_slot(slot_id: str, slot: SlotUpdate):
 @router.delete("/slots/{slot_id}")
 async def delete_slot(slot_id: str):
     result = slots_collection.delete_one({"uid": slot_id})
-    result = slots_collection.delete_one({"uid": slot_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Slot not found")
     return {"message": "Slot deleted successfully"}
-
 
 
