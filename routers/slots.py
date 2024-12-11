@@ -65,7 +65,7 @@ async def update_institution_average_engagement(institution_id: str):
 
 
 
-async def update_session_average_engagement(session_id: str, SlotUpdate: SlotUpdate):
+async def update_session_average_engagement(session_id: str):
     slots = list(slots_collection.find({"session_id": session_id}))
     if not slots:
         raise HTTPException(status_code=404, detail="No slots found for this session")
@@ -101,7 +101,7 @@ async def update_slot(slot_id: str, slot: Slot):
 
 #used by AI model to update engagement_scores
 @router.patch("/slots/{slot_id}")
-async def update_slot(slot_id: str, slot: Slot):
+async def update_slot(slot_id: str, slot: SlotUpdate):
     update_fields = slot.dict(exclude_unset=True)
 
     result = slots_collection.update_one({"uid": slot_id}, {"$set": update_fields})
