@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from database import slots_collection,sessions_collection,institutions_collection
-from models import Slot,SlotUpdate
+from models import Slot, SlotUpdate
 
 router = APIRouter()
 
@@ -81,7 +81,7 @@ async def update_institution_average_engagement(institution_id: str):
     print("Institution update successfull")
 
 
-async def update_session_average_engagement(session_id: str):
+async def update_session_average_engagement(session_id: str, SlotUpdate: SlotUpdate):
     slots = list(slots_collection.find({"session_id": session_id}))
     if not slots:
         raise HTTPException(status_code=404, detail="No slots found for this session")
