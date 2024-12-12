@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Body
 from database import slots_collection,sessions_collection,institutions_collection
 from models import Slot, SlotUpdate
 
@@ -115,6 +115,20 @@ async def update_slot(slot_id: str, slot: Slot):
 
     return {"message": "Slot updated successfully and related scores recalculated"}
 
+
+@router.post("/sessions/{session_id}/engagement_score")
+async def post_engagement_score(session_id: str, engagement_score: int = Body(...)):
+    session = sessions_collection.find_one({"uid": session_id})
+    if not session:
+        raise HTTPException(status_code=404, detail="Session not found")
+
+    slots_collection.update_many(
+        {"session_id": session_id},
+        {"$set": {"engagement_score": engagement_score}}
+    )
+
+    await update_session_average_engagement(session_id)
+    return {"message": "Engagement score posted successfully and related scores recalculated"}
 
 
 @router.delete("/slots/{slot_id}")
